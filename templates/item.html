@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <!-- Back link -->
+  <a href="{{ url_for('index') }}">← Back to catalog</a>
+
+  <!-- Item title & description -->
+  <h1>{{ item['Clothes Title'] }}</h1>
+  <p>{{ item['Clothes Description'] }}</p>
+
+  <!-- Metadata -->
+  <ul>
+    <li><strong>Department:</strong> {{ item['Department Name'] }}</li>
+  </ul>
+
+  <hr>
+
+  <!-- Add Review Button -->
+  <a
+    href="{{ url_for('new_review', item_id=item['Clothing ID']) }}"
+    style="display: inline-block; margin-bottom: 1em; padding: 0.5em 1em; background-color: #4A148C; color: white; text-decoration: none; border-radius: 4px;"
+  >
+    + Add a Review
+  </a>
+
+  <hr>
+
+  <!-- EXISTING REVIEWS (from dataset) -->
+  <h2>Reviews</h2>
+  {% if existing_reviews %}
+    <ul>
+      {% for r in existing_reviews %}
+        <li style="margin-bottom:1em; border-bottom:1px solid #ddd; padding-bottom:1em;">
+          <p>
+            <strong>{{ r['Title'] }}</strong>
+            (Age: {{ r['Age'] }}, Rating: {{ r['Rating'] }})
+          </p>
+          <p>{{ r['Review Text'] }}</p>
+          <p style="font-size:0.9em; color:#555;">
+            Recommended: <strong>{{ r['Recommended IND'] }}</strong>
+            <!-- &nbsp;|&nbsp; -->
+            <!-- Helpful: <strong>{{ r['Positive Feedback Count'] }}</strong> -->
+          </p>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No reviews available.</p>
+  {% endif %}
+
+  <!-- NEW REVIEWS (session‐added) -->
+  <hr>
+  <h2>New Reviews </h2>
+  {% if new_reviews %}
+    <ul>
+      {% for nr in new_reviews %}
+        <li style="margin-bottom:1em; border-bottom:1px solid #ddd; padding-bottom:1em;">
+          <p>
+            <strong>{{ nr.title }}</strong>
+            (Rating: {{ nr.rating }})
+          </p>
+          <p>{{ nr.text }}</p>
+          <p style="font-size:0.9em; color:#555;">
+            Recommended: <strong>{{ nr.final }}</strong>
+          </p>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No new reviews have been added this session.</p>
+  {% endif %}
+{% endblock %}
