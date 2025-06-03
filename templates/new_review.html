@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <a href="{{ url_for('item_detail', item_id=item_id) }}">← Back to item</a>
+  <h2>Add a Review (Step 1 of 2)</h2>
+
+  <form
+    id="review-form"
+    method="POST"
+    action="{{ url_for('new_review', item_id=item_id) }}"
+    onsubmit="return prepareForSubmit();"
+  >
+    <!-- Review Title -->
+    <label for="review_title"><strong>Review Title:</strong></label><br>
+    <input
+      type="text"
+      id="review_title"
+      name="review_title"
+      style="width: 100%; padding: 0.5rem;"
+      required
+    ><br><br>
+
+    <!-- Review Text -->
+    <label for="review_text"><strong>Review Text:</strong></label><br>
+    <textarea
+      id="review_text"
+      name="review_text"
+      rows="5"
+      style="width: 100%; padding: 0.5rem;"
+      required
+    ></textarea><br><br>
+
+    <!-- Rating -->
+    <label for="rating"><strong>Rating (1–5):</strong></label><br>
+    <select id="rating" name="rating" required style="padding: 0.4rem;">
+      <option value="">Select…</option>
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
+      <option value="5">5</option>
+    </select><br><br>
+
+    <!-- Predicted Label (editable) -->
+    <label for="predicted_label"><strong>Predicted Recommend Label:</strong></label><br>
+    <input
+      type="text"
+      id="predicted_label"
+      name="predicted_label"
+      value=""
+      style="width: 80px; padding: 0.4rem; border: 1px solid #ccc; border-radius: 4px;"
+    ><br>
+    <small style="color: gray;">
+      (Automatically updated as you type. You can edit this value before submitting.)
+    </small><br><br>
+
+    <!-- Hidden inputs to carry forward data on submit -->
+    <input type="hidden" id="predicted_hidden" name="predicted_hidden" value="">
+    <input type="hidden" id="review_title_hidden" name="review_title_hidden" value="">
+    <input type="hidden" id="review_text_hidden" name="review_text_hidden" value="">
+    <input type="hidden" id="rating_hidden" name="rating_hidden" value="">
+    <input type="hidden" name="confirm" value="1">
+
+    <!-- Submit Button -->
+    <button
+      type="submit"
+      style="
+        padding: 0.6rem 1.2rem;
+        background-color: #4A148C;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      "
+    >
+      Confirm &amp; Submit Review
+    </button>
+  </form>
+
+  <!-- JavaScript to auto-predict label as the user types -->
+  <script>
+    let debounceTimer = null;
+
+    // Called on every keystroke in Title or Text
+    function schedulePrediction() {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(fetchPrediction, 500);
+    }
+
+    // Fetch predicted label from server and populate the editable field
+    async function fetchPrediction() {
+      const title = document.getElementById('review_title').value.trim();
+      const text  = document.getElementById('review_text').value.trim();
+      if (!title && !text) {
+        document.getElementById('predicted_label').value = '';
+        return;
+      }
+
+      try {
+        const response = await fetch("{{ url_for('predict_review') }}", {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: title, text: text })
+        });
+        if (!response.ok) {
+          console.error("Prediction error", response.status);
+          return;
+        }
+        const data = await response.json();
+        if ('predicted' in data) {
+          document.getElementById('predicted_label').value = data.predicted;
+        }
+      } catch (error) {
+        console.error("Fetch error:", error);
+      }
+    }
+
+    // Before submitting, copy all visible fields into hidden inputs
+    function prepareForSubmit() {
+      document.getElementById('review_title_hidden').value = document.getElementById('review_title').value.trim();
+      document.getElementById('review_text_hidden').value = document.getElementById('review_text').value.trim();
+      document.getElementById('rating_hidden').value = document.getElementById('rating').value;
+      // Copy whatever is currently in the editable predicted_label field
+      document.getElementById('predicted_hidden').value = document.getElementById('predicted_label').value.trim();
+      return true; // allow form submission
+    }
+
+    // Attach input listeners
+    document.getElementById('review_title').addEventListener('input', schedulePrediction);
+    document.getElementById('review_text').addEventListener('input', schedulePrediction);
+  </script>
+{% endblock %}

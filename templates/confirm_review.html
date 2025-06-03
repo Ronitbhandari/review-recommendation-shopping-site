@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <a href="{{ url_for('item_detail', item_id=item_id) }}">← Back to item</a>
+  <h1>Review Confirmation (Step 2 of 2)</h1>
+
+  <h2>Review Content</h2>
+  <p><strong>Title:</strong> {{ review_title }}</p>
+  <p><strong>Text:</strong> {{ review_text }}</p>
+  <p><strong>Rating:</strong> {{ rating }}</p>
+
+  <hr>
+  <h2>Model’s Suggested Label</h2>
+  <p><strong>Predicted Recommend:</strong> <em>{{ predicted }}</em></p>
+
+  <form method="POST" action="{{ url_for('new_review', item_id=item_id) }}">
+    {# Hidden inputs carry forward the buyer’s data #}
+    <input
+      type="hidden"
+      name="review_title_hidden"
+      value="{{ review_title }}"
+    >
+    <input
+      type="hidden"
+      name="review_text_hidden"
+      value="{{ review_text }}"
+    >
+    <input
+      type="hidden"
+      name="rating_hidden"
+      value="{{ rating }}"
+    >
+    <input
+      type="hidden"
+      name="predicted_hidden"
+      value="{{ predicted }}"
+    >
+
+    <div style="margin-bottom:1em;">
+      <strong>Override Suggested Label?</strong><br>
+
+      <input
+        type="radio"
+        id="override_no"
+        name="override_label"
+        value="0"
+        {% if predicted == 0 %}checked{% endif %}
+      >
+      <label for="override_no">0 – Not Recommend</label><br>
+
+      <input
+        type="radio"
+        id="override_yes"
+        name="override_label"
+        value="1"
+        {% if predicted == 1 %}checked{% endif %}
+      >
+      <label for="override_yes">1 – Recommend</label>
+    </div>
+
+    {# Mark this as “Step 2” so the view knows to finalize #}
+    <input type="hidden" name="confirm" value="1">
+
+    <button type="submit">Confirm &amp; Submit Review</button>
+  </form>
+{% endblock %}

@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Hyped</title>
+    <!-- Link to our stylesheet -->
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/styles.css') }}"
+    />
+  </head>
+  <body>
+    <!-- New Navbar -->
+    <header>
+      <div class="header-nav">
+        <!-- Left: Logo/link to home -->
+        <a class="logo" href="{{ url_for('index') }}">Hyped</a>
+
+        <!-- Right: Search form -->
+        <!-- We use `request.args.get('q')` so that the input stays populated if you're already on a search results page -->
+        <form
+          class="search-nav"
+          method="get"
+          action="{{ url_for('search') }}"
+        >
+          <input
+            type="text"
+            name="q"
+            placeholder="Search items…"
+            value="{{ request.args.get('q', '') }}"
+            required
+          />
+          <button type="submit">Search</button>
+        </form>
+        {% if query is defined %}
+            <p style="color: white;">
+                {{ count }} item{{ count != 1 and 's' or '' }}
+                matched for “{{ query }}”.
+            </p>
+        {% endif %}
+
+      </div>
+    </header>
+
+    <!-- Main content wrapper -->
+    <div class="container">
+      {% block content %}{% endblock %}
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      &copy; 2025 Your Name
+    </footer>
+  </body>
+</html>
