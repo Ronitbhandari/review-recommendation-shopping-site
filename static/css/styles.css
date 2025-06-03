@@ -1,0 +1,286 @@
+/* ───────────────────────────────────────────────────────────────────────────
+   styles.css
+   A simple, responsive stylesheet to tidy up the home page and forms.
+─────────────────────────────────────────────────────────────────────────── */
+
+:root {
+  --primary-color: #4A148C;
+  --primary-dark:  #38006B;
+  --text-color:    #333;
+  --bg-light:      #f9f9f9;
+  --card-bg:       #ffffff;
+  --card-shadow:   rgba(0, 0, 0, 0.1);
+  --font-body:     "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Base resets */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--bg-light);
+  color: var(--text-color);
+  line-height: 1.6;
+}
+
+/* Header */
+header {
+  background-color: var(--primary-color);
+  padding: 1.2rem 0;
+  text-align: center;
+}
+header h1 a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 2rem;
+  font-weight: 600;
+}
+header h1 a:hover {
+  color: #eee;
+}
+
+/* A simple container to center content */
+.container {
+  max-width: 960px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+/* Page titles */
+h1, h2 {
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+/* Search form */
+form.search {
+  display: flex;
+  margin-bottom: 2rem;
+}
+form.search input[type="text"] {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 4px 0 0 4px;
+  font-size: 1rem;
+}
+form.search button {
+  padding: 0.5rem 1rem;
+  border: none;
+  background-color: var(--primary-color);
+  color: #fff;
+  font-size: 1rem;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
+}
+form.search button:hover {
+  background-color: var(--primary-dark);
+}
+
+/* Unordered list of items on homepage */
+ul.items-list {
+  list-style: none;
+  padding: 0;
+}
+ul.items-list li {
+  background-color: var(--card-bg);
+  margin-bottom: 1.5rem;
+  padding: 1rem 1.25rem;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px var(--card-shadow);
+  transition: transform 0.1s ease-in-out;
+}
+ul.items-list li:hover {
+  transform: translateY(-2px);
+}
+ul.items-list li a {
+  font-size: 1.2rem;
+  color: var(--primary-color);
+  text-decoration: none;
+}
+ul.items-list li a:hover {
+  text-decoration: underline;
+}
+ul.items-list li small {
+  display: block;
+  margin-top: 0.5rem;
+  color: #666;
+  font-size: 0.95rem;
+}
+
+/* “Add a Review” button styling */
+.btn-add-review {
+  display: inline-block;
+  margin-bottom: 1.5rem;
+  padding: 0.5rem 1rem;
+  background-color: var(--primary-color);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  border-radius: 4px;
+  transition: background-color 0.15s ease-in-out;
+}
+.btn-add-review:hover {
+  background-color: var(--primary-dark);
+}
+
+/* Review cards */
+ul.review-list {
+  list-style: none;
+  padding: 0;
+}
+ul.review-list li {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #ddd;
+}
+ul.review-list li p {
+  margin-bottom: 0.5rem;
+}
+
+/* Form fields */
+form.new-review-form label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+}
+form.new-review-form input[type="text"],
+form.new-review-form textarea,
+form.new-review-form select {
+  width: 100%;
+  padding: 0.45rem 0.6rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-family: var(--font-body);
+}
+form.new-review-form button {
+  padding: 0.6rem 1.2rem;
+  background-color: var(--primary-color);
+  color: #fff;
+  border: none;
+  font-size: 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.15s ease-in-out;
+}
+form.new-review-form button:hover {
+  background-color: var(--primary-dark);
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  padding: 1.5rem 0;
+  margin-top: 3rem;
+  color: #777;
+  font-size: 0.9rem;
+}
+
+
+/* ───────────────────────────────────────────────────────────────────────────
+   Card grid and card styling for index.html
+─────────────────────────────────────────────────────────────────────────── */
+
+.items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+  list-style: none;
+  padding: 0;
+}
+
+.card {
+  background-color: #ffffff;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  transition: transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.card a {
+  display: block;
+  font-size: 1.1rem;
+  color: #4A148C; /* primary color */
+  text-decoration: none;
+  margin-bottom: 0.5rem;
+}
+
+.card a:hover {
+  text-decoration: underline;
+}
+
+.card p {
+  color: #555;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* ───────────────────────────────────────────────────────────────────────────
+   Navbar and search‐in‐navbar styles
+─────────────────────────────────────────────────────────────────────────── */
+
+header {
+  background-color: var(--primary-color);
+  padding: 0.75rem 0;
+}
+
+.header-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+header .logo {
+  color: #fff;
+  text-decoration: none;
+  font-size: 1.75rem;
+  font-weight: 600;
+}
+
+header .logo:hover {
+  color: #eee;
+}
+
+.search-nav {
+  display: flex;
+  width: 100%;
+  max-width: 400px;
+}
+
+.search-nav input[type="text"] {
+  flex: 1;
+  padding: 0.45rem 0.6rem;
+  border: none;
+  border-radius: 4px 0 0 4px;
+  font-size: 1rem;
+}
+
+.search-nav button {
+  padding: 0.45rem 0.8rem;
+  border: none;
+  background-color: #fff;
+  color: var(--primary-color);
+  font-size: 1rem;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
+  transition: background-color 0.15s ease-in-out;
+}
+
+.search-nav button:hover {
+  background-color: #f0f0f0;
+}
