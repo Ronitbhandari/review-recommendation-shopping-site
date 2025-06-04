@@ -10,7 +10,7 @@
 
   <!-- Metadata -->
   <ul>
-    <li><strong>Department:</strong> {{ item['Department Name'] }}</li>
+    <strong>Department:</strong> {{ item['Department Name'] }}
   </ul>
 
   <hr>
@@ -37,7 +37,10 @@
           </p>
           <p>{{ r['Review Text'] }}</p>
           <p style="font-size:0.9em; color:#555;">
-            Recommended: <strong>{{ r['Recommended IND'] }}</strong>
+            Recommended:
+            <strong>
+              {{ "Yes" if r['Recommended IND'] == 1 else "No" }}
+            </strong>
           </p>
         </li>
       {% endfor %}
@@ -46,9 +49,9 @@
     <p>No reviews available.</p>
   {% endif %}
 
-  <!-- NEW REVIEWS (session‐added) -->
+   <!-- NEW REVIEWS (session‐added) -->
   <hr>
-  <h2>New Reviews </h2>
+  <h2>New Reviews</h2>
   {% if new_reviews %}
     <ul>
       {% for nr in new_reviews %}
@@ -59,7 +62,10 @@
           </p>
           <p>{{ nr.text }}</p>
           <p style="font-size:0.9em; color:#555;">
-            Recommended: <strong>{{ nr.final }}</strong>
+            Recommended:
+            <strong>
+              {{ "Yes" if nr.final == 1 else "No" }}
+            </strong>
           </p>
         </li>
       {% endfor %}

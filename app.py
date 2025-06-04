@@ -3,23 +3,40 @@ from flask import Flask, abort, jsonify, redirect, render_template, request, url
 import pandas as pd
 import pickle
 import re
+from nltk.stem import WordNetLemmatizer
+from nltk.tokenize import word_tokenize
+import nltk
+nltk.download('punkt_tab')
+nltk.download('punkt')
+nltk.download('wordnet')
+nltk.download('omw-1.4')
 
 app = Flask(__name__)
+
 
 # load  data & model  
 df = pd.read_csv('data/assignment3_II.csv')
 with open('model/vectorizer.pkl', 'rb') as f: vec = pickle.load(f)
 with open('model/model.pkl', 'rb') as f:  clf = pickle.load(f)
 
+# Initialize WordNet lemmatizer
+lemmatizer = WordNetLemmatizer()
+
+def lemmatize_text(text: str) -> str:
+    """
+    Lowercase + tokenize on whitespace/punctuation, keep alphabetic tokens,
+    lemmatize each token, then join back into a single space‐separated string.
+    """
+    tokens = word_tokenize((text or "").lower())
+    lemmas = [lemmatizer.lemmatize(tok) for tok in tokens if tok.isalpha()]
+    return " ".join(lemmas)
+
+# Created two new columns that hold the lemmatized title & description
+df['lemmatized_title'] = df['Clothes Title'].fillna('').map(lemmatize_text)
+df['lemmatized_desc']  = df['Clothes Description'].fillna('').map(lemmatize_text)
+
 reviews = {}
 
-def normalize_keyword(q: str) -> str:
-    q = q.strip().lower()
-    if q.endswith('es'):
-        return q[:-2]
-    elif q.endswith('s'):
-        return q[:-1]
-    return q
 
 @app.route('/', methods=['GET'])
 def index():
@@ -31,37 +48,58 @@ def index():
     ]]
     items = items_df.to_dict(orient='records')
     return render_template('index.html', items=items)
-
+    
+#  Lemmatization‐Based Matching 
 @app.route('/search', methods=['GET'])
 def search():
-    query = request.args.get('q', '').strip()
+    """
+    We can search based on the string through clothing items. 
+    I am using lemmatization for the search feature to match all the 
+    possible items with the searched word.
+
+    Steps:
+      1) Lowercase & tokenize the user’s query.
+      2) Lemmatize each alphabetic token.
+      3) Build a regex that matches any one of those lemmas as whole words.
+      4) Return all items whose precomputed lemmatized_title OR lemmatized_desc
+         contains at least one of the query’s lemmas.
+    """
+    raw_query = request.args.get('q', '').strip()
+    query = raw_query.lower()
     items, count = [], 0
 
     if query:
-        key     = normalize_keyword(query)
-        pattern = rf'\b{re.escape(key)}\b'
+        # Tokenize & lemmatize the query
+        query_tokens = [
+            lemmatizer.lemmatize(tok) 
+            for tok in word_tokenize(query) 
+            if tok.isalpha()
+        ]
 
-        mask_title = df['Clothes Title'].fillna('').str.lower()\
-                       .str.contains(pattern, regex=True)
-        mask_desc  = df['Clothes Description'].fillna('').str.lower()\
-                       .str.contains(pattern, regex=True)
+        if query_tokens:
+            # 2) Build a regex that matches any lemma as a whole word
+            #    if query_tokens = ["dress","flow"], pattern = r'\b(?:dress|flow)\b'
+            pattern = r'\b(?:' + "|".join(re.escape(tok) for tok in query_tokens) + r')\b'
 
-        filtered = (
-            df[mask_title | mask_desc]
-            .drop_duplicates(subset='Clothing ID')
-            [['Clothing ID','Clothes Title','Clothes Description']]
-        )
+            #  Filter: match precomputed lemmatized columns
+            mask_title = df['lemmatized_title'].str.contains(pattern, regex=True)
+            mask_desc  = df['lemmatized_desc'].str.contains(pattern, regex=True)
 
-        items = filtered.to_dict(orient='records')
-        count = len(items)
+            filtered = (
+                df[mask_title | mask_desc]
+                .drop_duplicates(subset='Clothing ID')
+                [['Clothing ID', 'Clothes Title', 'Clothes Description']]
+            )
+
+            items = filtered.to_dict(orient='records')
+            count = len(items)
 
     return render_template(
         'index.html',
         items=items,
-        query=query,
+        query=raw_query,  
         count=count
-    )
-    
+    )   
     
 @app.route('/item/<int:item_id>', methods=['GET'])
 def item_detail(item_id):
