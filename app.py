@@ -6,7 +6,7 @@ import re
 
 app = Flask(__name__)
 
-# --- load your data & model as before ---
+# load  data & model  
 df = pd.read_csv('data/assignment3_II.csv')
 with open('model/vectorizer.pkl', 'rb') as f: vec = pickle.load(f)
 with open('model/model.pkl', 'rb') as f:  clf = pickle.load(f)
@@ -92,20 +92,21 @@ def item_detail(item_id):
  
 @app.route('/item/<int:item_id>/review', methods=['GET', 'POST'])
 def new_review(item_id):
-    # 1. Verify the item exists
+    #  Verify the item exists
     item_rows = df[df['Clothing ID'] == item_id]
     if item_rows.empty:
         abort(404)
 
-    # 2. Handle the POST after “Confirm & Submit Review”
+    #  Handle the POST after “Confirm & Submit Review”
     if request.method == 'POST' and request.form.get('confirm'):
-        # a) Extract hidden form fields (populated by your JS)
+        #  Extract hidden form fields (populated by your JS)
         review_title = request.form.get('review_title_hidden', '').strip()
         review_text  = request.form.get('review_text_hidden', '').strip()
+        age  = request.form.get('age_hidden', '').strip()
         rating       = request.form.get('rating_hidden', '').strip()
         final_label  = int(request.form.get('predicted_hidden', '0') or 0)
 
-        # b) Look up item-level fields from the existing DataFrame
+        # Look up item-level fields from the existing DataFrame
         base = item_rows.iloc[0]
         division     = base['Division Name']
         department   = base['Department Name']
@@ -113,19 +114,15 @@ def new_review(item_id):
         clothes_t    = base['Clothes Title']
         clothes_desc = base['Clothes Description']
 
-        # c) Build a list matching the CSV column order:
-        #    ['Clothing ID','Age','Title','Review Text','Rating',
-        #     'Recommended IND','Positive Feedback Count',
-        #     'Division Name','Department Name','Class Name',
-        #     'Clothes Title','Clothes Description']
+        # a list matching the CSV column order:
         new_row_list = [
             item_id,
-            '',                # Age (blank)
+            age,            
             review_title,
             review_text,
             rating,
             final_label,
-            0,                 # Positive Feedback Count (new reviews start at 0)
+            0,                 
             division,
             department,
             class_name,
@@ -133,15 +130,16 @@ def new_review(item_id):
             clothes_desc
         ]
 
-        # d) Append that one line to the CSV file without rewriting everything
+        # Append that one line to the CSV file without rewriting everything
         with open('data/assignment3_II.csv', 'a', newline='', encoding='utf-8') as f:
             writer = csv.writer(f)
             writer.writerow(new_row_list)
 
-        # e) Also store it in the in-memory dict so it appears immediately
+        # Also stored it in the in-memory dict so it appears immediately
         reviews.setdefault(item_id, []).append({
             'title':     review_title,
             'text':      review_text,
+            'age':       age,
             'rating':    rating,
             'predicted': final_label,
             'final':     final_label
@@ -149,11 +147,11 @@ def new_review(item_id):
 
         return redirect(url_for('item_detail', item_id=item_id))
 
-    # 3. Otherwise (GET or missing confirm), render the form
+    #  render the form
     return render_template('new_review.html', item_id=item_id)
     
     
-# ─── Predict Review Endpoint ────────────────────────────────────────────
+#  Predict Review Endpoint 
 @app.route('/predict_review', methods=['POST'])
 def predict_review():
     """
