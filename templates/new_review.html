@@ -19,8 +19,9 @@
       style="width: 100%; padding: 0.5rem;"
       required
     ><br><br>
-    <!-- Review Title -->
-    <label for="Age"><strong>Age</strong></label><br>
+
+    <!-- Age -->
+    <label for="Age"><strong>Age:</strong></label><br>
     <input
       type="text"
       id="Age"
@@ -50,7 +51,7 @@
       <option value="5">5</option>
     </select><br><br>
 
-    <!-- Predicted Label -->
+    <!-- Predicted Label (shows Yes/No) -->
     <label for="predicted_label"><strong>Predicted Recommend Label:</strong></label><br>
     <input
       type="text"
@@ -60,7 +61,7 @@
       style="width: 80px; padding: 0.4rem; border: 1px solid #ccc; border-radius: 4px;"
     ><br>
     <small style="color: gray;">
-      (Automatically updated as you type. You can edit this value before submitting.)
+      ( You can edit “Yes” or “No” before submitting.)
     </small><br><br>
 
     <!-- Hidden inputs to carry forward data on submit -->
@@ -97,7 +98,7 @@
       debounceTimer = setTimeout(fetchPrediction, 500);
     }
 
-    // Fetch predicted label from server and populate the editable field
+    // Fetch predicted label from server, then set "Yes"/"No"
     async function fetchPrediction() {
       const title = document.getElementById('review_title').value.trim();
       const text  = document.getElementById('review_text').value.trim();
@@ -118,25 +119,35 @@
         }
         const data = await response.json();
         if ('predicted' in data) {
-          document.getElementById('predicted_label').value = data.predicted;
+          // Convert 0/1 to "No"/"Yes"
+          document.getElementById('predicted_label').value = data.predicted === 1 ? "Yes" : "No";
         }
       } catch (error) {
         console.error("Fetch error:", error);
       }
     }
 
-    // Before submitting, copy all visible fields into hidden inputs
+    // Before submitting, copy visible fields into hidden inputs
     function prepareForSubmit() {
+      //  Copy title, text, age, rating
       document.getElementById('review_title_hidden').value = document.getElementById('review_title').value.trim();
       document.getElementById('review_text_hidden').value = document.getElementById('review_text').value.trim();
       document.getElementById('age_hidden').value = document.getElementById('Age').value.trim();
       document.getElementById('rating_hidden').value = document.getElementById('rating').value;
-      
-      document.getElementById('predicted_hidden').value = document.getElementById('predicted_label').value.trim();
+
+      // Convert predicted_label "Yes"/"No" back to 1/0
+      const visibleVal = document.getElementById('predicted_label').value.trim().toLowerCase();
+      let numeric = 0;
+      if (visibleVal === "yes" || visibleVal === "1") {
+        numeric = 1;
+      }
+      // Anything else (including "no" or blank) remains 0
+      document.getElementById('predicted_hidden').value = numeric;
+
       return true; // allow form submission
     }
 
-    //  input listeners
+    // Attached listeners to Title & Text fields
     document.getElementById('review_title').addEventListener('input', schedulePrediction);
     document.getElementById('review_text').addEventListener('input', schedulePrediction);
   </script>
