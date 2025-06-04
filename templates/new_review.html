@@ -19,6 +19,15 @@
       style="width: 100%; padding: 0.5rem;"
       required
     ><br><br>
+    <!-- Review Title -->
+    <label for="Age"><strong>Age</strong></label><br>
+    <input
+      type="text"
+      id="Age"
+      name="Age"
+      style="width: 100%; padding: 0.5rem;"
+      required
+    ><br><br>
 
     <!-- Review Text -->
     <label for="review_text"><strong>Review Text:</strong></label><br>
@@ -41,7 +50,7 @@
       <option value="5">5</option>
     </select><br><br>
 
-    <!-- Predicted Label (editable) -->
+    <!-- Predicted Label -->
     <label for="predicted_label"><strong>Predicted Recommend Label:</strong></label><br>
     <input
       type="text"
@@ -58,6 +67,7 @@
     <input type="hidden" id="predicted_hidden" name="predicted_hidden" value="">
     <input type="hidden" id="review_title_hidden" name="review_title_hidden" value="">
     <input type="hidden" id="review_text_hidden" name="review_text_hidden" value="">
+    <input type="hidden" id="age_hidden" name="age_hidden" value="">
     <input type="hidden" id="rating_hidden" name="rating_hidden" value="">
     <input type="hidden" name="confirm" value="1">
 
@@ -119,13 +129,14 @@
     function prepareForSubmit() {
       document.getElementById('review_title_hidden').value = document.getElementById('review_title').value.trim();
       document.getElementById('review_text_hidden').value = document.getElementById('review_text').value.trim();
+      document.getElementById('age_hidden').value = document.getElementById('Age').value.trim();
       document.getElementById('rating_hidden').value = document.getElementById('rating').value;
-      // Copy whatever is currently in the editable predicted_label field
+      
       document.getElementById('predicted_hidden').value = document.getElementById('predicted_label').value.trim();
       return true; // allow form submission
     }
 
-    // Attach input listeners
+    //  input listeners
     document.getElementById('review_title').addEventListener('input', schedulePrediction);
     document.getElementById('review_text').addEventListener('input', schedulePrediction);
   </script>
